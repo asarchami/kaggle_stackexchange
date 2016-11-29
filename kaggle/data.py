@@ -1,24 +1,19 @@
-import glob as glob
-import os
 import pandas as pd
+import os
 from bs4 import BeautifulSoup
 
 
-def import_csv(targetdir):
-    path = r'%s' % targetdir  # use your path
-    allFiles = glob.glob(path + "/*.csv")
-    frame = pd.DataFrame()
-    list_ = []
-    for file_ in allFiles:
-        df = pd.read_csv(file_, index_col=None, header=0)
-        df['file_name'] = file_
-        list_.append(df)
-    frame = pd.concat(list_)
-    return frame
-
+def import_csv():
+    filenames = ["dataset/"+filename for filename in os.listdir("dataset") if filename.endswith(".csv")]
+    csvs = []
+    for filename in filenames:
+        df = pd.read_csv(filename)
+        df['file_name'] = filename
+        csvs.append(df)
+    return pd.concat(csvs, axis=0).reset_index()
 
 def clean_dataset(data):
-    data.drop('id', axis=1)
+    data = data.drop(['id', 'index'], axis=1)
     data.content = data.content.apply(
         lambda x: BeautifulSoup(x, "lxml").text.replace('\n', ' '))
     data.file_name = data.file_name.str.replace(
@@ -26,5 +21,5 @@ def clean_dataset(data):
     return data
 
 
-def get_data(targetdir):
-    return clean_dataset(import_csv(targetdir))
+def get_data():
+    return clean_dataset(import_csv())
