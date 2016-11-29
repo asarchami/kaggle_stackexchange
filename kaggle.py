@@ -1,3 +1,5 @@
 from kagfuncs.read_csv import import_csv
 
-print import_csv('dataset')
+all_csv = import_csv('dataset')
+
+print all_csv.shape
