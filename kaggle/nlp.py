@@ -4,6 +4,7 @@ from nltk import word_tokenize, pos_tag
 
 
 def _remove_duplicates(values):
+    # Don't use this function unless you need it! this is a private function
     output = []
     seen = set()
     for value in values:
@@ -11,9 +12,13 @@ def _remove_duplicates(values):
             output.append(value)
             seen.add(value)
     return output
+    # return value is a list of unique values
 
 
-def process_content(sentence):
+def process_content(sentence, stopwords):
+    # this function creates tags from the sentence fiven to it
+    # first argument is the sentence which we need to tagg and
+    # and second one is the stopwords.
     tokens = sent_tokenize(sentence, language='english')
     cp = nltk.RegexpParser(r"""chunk: {<NNP>*<NN>*}""")
     chunks = []
@@ -31,3 +36,4 @@ def process_content(sentence):
             tags.append("-".join([t[0] for t in tree.leaves()]))
     tags
     return _remove_duplicates(tags)
+    # return value is a list of taggs
