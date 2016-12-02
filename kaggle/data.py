@@ -5,20 +5,23 @@ from bs4 import BeautifulSoup
 
 def import_csv():
     if os.path.exists('dataset/all_csvs.csv'):
-        return pd.read_csv('dataset/all_csvs.csv', index_col=0)
+        return pd.read_csv(
+            'dataset/all_csvs.csv', index_col=0, encoding='utf8')
     else:
-        filenames = ["dataset/"+filename for filename in os.listdir("dataset") if filename.endswith(".csv")]
+        files = ['biology', 'cooking', 'crypto', 'diy', 'robotics', 'travel']
+        filenames = ["dataset/{}.csv".format(filename) for
+                     filename in files]
         csvs = []
         for filename in filenames:
             df = pd.read_csv(filename, encoding='utf-8')
             df['file_name'] = filename
             csvs.append(df)
-        df = clean_dataset(pd.concat(csvs, axis=0).reset_index())
+        df = _clean_dataset(pd.concat(csvs, axis=0).reset_index())
         df.to_csv('dataset/all_csvs.csv', encoding='utf8')
         return df
 
 
-def clean_dataset(data):
+def _clean_dataset(data):
     if 'id' in data.columns:
         data = data.drop('id', axis=1)
     if 'index' in data.columns:
