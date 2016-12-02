@@ -1,6 +1,7 @@
 import nltk
 from nltk.tokenize import sent_tokenize
 from nltk import word_tokenize, pos_tag
+import os
 
 
 def _remove_duplicates(values):
@@ -20,13 +21,14 @@ def process_content(sentence, stopwords):
     # first argument is the sentence which we need to tagg and
     # and second one is the stopwords.
     tokens = sent_tokenize(sentence, language='english')
-    cp = nltk.RegexpParser(r"""chunk: {<NNP>*<NN>*}""")
+    cp = nltk.RegexpParser(r"""chunk: {<NNP>*<NNPS>*<NN>*<NNS>*}""")
     chunks = []
     for sent in tokens:
         tree = cp.parse(pos_tag(word_tokenize(sent)))
         for subtree in tree.subtrees():
             if subtree.label() == 'chunk':
                 chunks.append(subtree)
+#     return chunks
     tags = []
     for tree in chunks:
         if len(tree.leaves()) == 1:
@@ -35,5 +37,20 @@ def process_content(sentence, stopwords):
         else:
             tags.append("-".join([t[0] for t in tree.leaves()]))
     tags
-    return _remove_duplicates(tags)
-    # return value is a list of taggs
+    return tags    # return value is a list of taggs
+
+
+def create_taggs(data):
+    if os.path.exists('dataset/all_tagged.csv'):
+        return pd.read_csv('dataset/all_tagged.csv', encoding='utf8')
+    else:
+        with open("kaggle/long_stopwords.txt") as f:
+            stopwords = [word for line in f for word in line.split()]
+        for i in range(len(data)):
+            sentence = " ".join([data.loc[i, 'content'], data.loc[i, 'title']])
+            data.loc[i, 'gen_tag'] = " ".join(
+                process_content(sentence, stopwords))
+            data.loc[i, 'gen_tag_unique'] = " ".join(
+                _remove_duplicates(process_content(sentence, stopwords)))
+        data.to_csv('dataset/all_tagged.csv', encoding='utf8')
+        return data
