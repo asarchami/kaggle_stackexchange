@@ -20,6 +20,8 @@ def process_content(sentence, stopwords):
     # this function creates tags from the sentence fiven to it
     # first argument is the sentence which we need to tagg and
     # and second one is the stopwords.
+    # you probablty not gonna need to use this function in your code
+    # TODO: may change the chunk parser for better chunking
     tokens = sent_tokenize(sentence, language='english')
     cp = nltk.RegexpParser(r"""chunk: {<NNP>*<NNPS>*<NN>*<NNS>*}""")
     chunks = []
@@ -41,6 +43,9 @@ def process_content(sentence, stopwords):
 
 
 def create_taggs(data):
+    # this function creates two two columns one with generated taggs and
+    # the other with unique generated taggs and save them so we don't have to
+    # do the process every time
     if os.path.exists('dataset/all_tagged.csv'):
         return pd.read_csv('dataset/all_tagged.csv', encoding='utf8')
     else:
@@ -54,3 +59,4 @@ def create_taggs(data):
                 _remove_duplicates(process_content(sentence, stopwords)))
         data.to_csv('dataset/all_tagged.csv', encoding='utf8')
         return data
+    # returns the generated dataframe

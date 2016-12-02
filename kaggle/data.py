@@ -3,7 +3,9 @@ import os
 from bs4 import BeautifulSoup
 
 
-def import_csv():
+def _import_csv():
+    # Here we concat multiple training csvs to a single one and
+    # clean the results from html tags and stuff and save it to file
     if os.path.exists('dataset/all_csvs.csv'):
         return pd.read_csv(
             'dataset/all_csvs.csv', index_col=0, encoding='utf8')
@@ -19,9 +21,12 @@ def import_csv():
         df = _clean_dataset(pd.concat(csvs, axis=0).reset_index())
         df.to_csv('dataset/all_csvs.csv', encoding='utf8')
         return df
+    # returns the dataframe
 
 
 def _clean_dataset(data):
+    # cleans the dataframe from unwanted columns and html tags
+    # also handles some unicode stuff
     if 'id' in data.columns:
         data = data.drop('id', axis=1)
     if 'index' in data.columns:
@@ -41,4 +46,4 @@ def _clean_dataset(data):
 
 
 def get_data():
-    return import_csv()
+    return _import_csv()
